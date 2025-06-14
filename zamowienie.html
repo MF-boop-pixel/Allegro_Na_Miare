@@ -175,7 +175,7 @@
 
         const zamowienia = JSON.parse(localStorage.getItem('customOrders')) || [];
 
-        const data = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const data = new Date().toISOString().split('T')[0]; 
 
         zamowienia.push({
           produkt: produktInfo.tytul,
