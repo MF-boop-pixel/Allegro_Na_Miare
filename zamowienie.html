@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zamówienie na wymiar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e5ede3;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #f2fccc;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    .product-image {
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+    .form-container {
+      background-color: #808c7f;
+      color: white;
+      border-radius: 30px;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #f1ff72;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e1ef60;
+    }
+  </style>
+</head>
+<body>
+  <header>Formularz zamówienia na wymiar</header>
+  <div class="container">
+    <img id="productImage" class="product-image" src="" alt="Produkt">
+    <form id="formContainer" class="form-container"></form>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const produkt = params.get('produkt');
+
+    const produkty = {
+      stol_debowy: {
+        obraz: "stol_debowy.jpg",
+        tytul: "Stół dębowy",
+        pola: ["Długość", "Szerokość", "Wysokość", "Kolor", "Materiał"]
+      },
+      zegar_scienny: {
+        obraz: "zegar_scienny.jpg",
+        tytul: "Zegar ścienny",
+        pola: ["Średnica tarczy", "Materiał", "Kolor"]
+      },
+      krzeslo_brzozowe: {
+        obraz: "krzeslo_brzozowe.jpg",
+        tytul: "Krzesło brzozowe",
+        pola: ["Wysokość siedziska", "Szerokość", "Materiał", "Kolor drewna"]
+      },
+      komoda: {
+        obraz: "komoda.jpg",
+        tytul: "Komoda",
+        pola: ["Szerokość", "Wysokość", "Liczba szuflad", "Kolor"]
+      },
+      stol_epoksydowy: {
+        obraz: "stol_epoksydowy.jpg",
+        tytul: "Stół epoksydowy",
+        pola: ["Wymiary", "Kolor żywicy", "Rodzaj drewna"]
+      },
+      krzeslo_materialowe: {
+        obraz: "krzeslo_materialowe.jpg",
+        tytul: "Krzesło materiałowe",
+        pola: ["Kolor tapicerki", "Materiał nóg", "Wysokość siedziska"]
+      },
+      komoda_debowa: {
+        obraz: "komoda_debowa.jpg",
+        tytul: "Komoda dębowa",
+        pola: ["Wysokość", "Szerokość", "Liczba drzwi", "Materiał"]
+      },
+      zegar_wolnostojacy: {
+        obraz: "zegar_wolnostojacy.jpg",
+        tytul: "Zegar wolnostojący",
+        pola: ["Wysokość", "Materiał", "Mechanizm"]
+      },
+      drzwi_przesuwne: {
+        obraz: "drzwi_przesuwne.jpg",
+        tytul: "Drzwi przesuwne",
+        pola: ["Szerokość", "Wysokość", "Kolor", "Rodzaj prowadnicy"]
+      }
+    };
+
+    const produktInfo = produkty[produkt];
+
+    if (produktInfo) {
+      document.getElementById("productImage").src = produktInfo.obraz;
+      document.getElementById("productImage").alt = produktInfo.tytul;
+
+      const form = document.getElementById("formContainer");
+
+      const heading = document.createElement("h2");
+      heading.textContent = produktInfo.tytul;
+      form.appendChild(heading);
+
+      produktInfo.pola.forEach(pole => {
+        const label = document.createElement("label");
+        label.textContent = pole + ":";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = pole;
+        input.required = true;
+
+        form.appendChild(label);
+        form.appendChild(input);
+      });
+
+      const dodatkowePola = [
+        { label: "Imię i nazwisko", name: "imie_nazwisko", type: "text" },
+        { label: "Adres dostawy", name: "adres_dostawy", type: "text" },
+        { label: "Numer telefonu", name: "telefon", type: "tel" }
+      ];
+
+      dodatkowePola.forEach(item => {
+        const label = document.createElement("label");
+        label.textContent = item.label + ":";
+
+        const input = document.createElement("input");
+        input.type = item.type;
+        input.name = item.name;
+        input.required = true;
+
+        form.appendChild(label);
+        form.appendChild(input);
+      });
+
+      const button = document.createElement("button");
+      button.type = "submit";
+      button.textContent = "Zamów na wymiar";
+      form.appendChild(button);
+
+      form.onsubmit = function (e) {
+        e.preventDefault();
+
+        const zamowienia = JSON.parse(localStorage.getItem('customOrders')) || [];
+
+        const data = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+        zamowienia.push({
+          produkt: produktInfo.tytul,
+          data: data
+        });
+
+        localStorage.setItem('customOrders', JSON.stringify(zamowienia));
+
+        alert("Zamówienie zostało złożone pomyślnie!");
+        window.location.href = "konto.html";
+      };
+    } else {
+      document.getElementById("formContainer").innerHTML = "<p>Nieznany produkt.</p>";
+    }
+  </script>
+</body>
+</html>

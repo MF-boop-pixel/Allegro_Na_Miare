@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Potwierdzenie zamówienia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e5ede3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .confirmation-box {
+      background-color: #a6ada2;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      color: white;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .confirmation-box h2 {
+      margin-bottom: 20px;
+    }
+    .copy-btn {
+      background-color: #f1ff72;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .copy-btn:hover {
+      background-color: #e1ef60;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-box">
+    <h2>Zamówienie zostało złożone pomyślnie!</h2>
+    <p id="confirmationText">Dziękujemy za Twoje zamówienie! Skontaktujemy się z Tobą wkrótce w celu potwierdzenia szczegółów.</p>
+    <button class="copy-btn" onclick="copyText()">Kopiuj komunikat</button>
+  </div>
+
+  <script>
+    function copyText() {
+      const text = document.getElementById("confirmationText").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Komunikat został skopiowany do schowka!");
+      }).catch(err => {
+        alert("Wystąpił błąd podczas kopiowania.");
+      });
+    }
+  </script>
+</body>
+</html>

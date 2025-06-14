@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moje konto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #d1d3d4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: #888;
+      padding: 30px;
+      border-radius: 10px;
+      color: white;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: none;
+      margin-top: 4px;
+    }
+    .submit-btn, .logout-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #c6ff00;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .submit-btn:hover, .logout-btn:hover {
+      background-color: #b0e000;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      color: black;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="account-content">
+  <h1>Ustawienia konta:</h1>
+
+  <div class="section">
+    <div class="section-title">Dane osobowe</div>
+    <form id="profile-form">
+      <div class="form-group">
+        <label for="name">Imię i nazwisko:</label>
+        <input type="text" id="name" name="name">
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" readonly>
+      </div>
+      <div class="form-group">
+        <label for="address">Adres:</label>
+        <input type="text" id="address" name="address">
+      </div>
+      <button type="submit" class="submit-btn">Zapisz dane</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historia zamówień</div>
+    <table id="order-history">
+      <thead>
+      <tr>
+        <th>Data</th>
+        <th>Produkt</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="2">Ładowanie danych...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Wyloguj się</button>
+</div>
+
+<script>
+  // Pobierz dane użytkownika z localStorage
+  const userDataRaw = localStorage.getItem('user');
+  if (!userDataRaw) window.location.href = 'logowanie.html';
+
+  let userData;
+  try {
+    userData = JSON.parse(userDataRaw);
+  } catch (e) {
+    console.error("Błędny format danych użytkownika w localStorage");
+    window.location.href = 'logowanie.html';
+  }
+
+  const email = userData.email || '';
+  document.getElementById('email').value = email;
+
+  // Wczytaj dane profilu z localStorage, jeśli istnieją
+  const localProfile = JSON.parse(localStorage.getItem('profileData_' + email));
+  if (localProfile) {
+    document.getElementById('name').value = localProfile.name || '';
+    document.getElementById('address').value = localProfile.address || '';
+  }
+
+  // Pobierz dane profilu z serwera, nadpisz localStorage
+  fetch('pobierz_dane.php?email=' + encodeURIComponent(email))
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.name) document.getElementById('name').value = data.name;
+      if (data && data.address) document.getElementById('address').value = data.address;
+      localStorage.setItem('profileData_' + email, JSON.stringify(data));
+    })
+    .catch(err => console.error(err));
+
+  // Obsługa zapisu formularza
+  document.getElementById('profile-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const address = document.getElementById('address').value;
+
+    const formData = new FormData(this);
+
+    fetch('zapisz_dane.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.text())
+      .then(response => {
+        alert('Dane zapisane pomyślnie');
+        const profileData = { email, name, address };
+        localStorage.setItem('profileData_' + email, JSON.stringify(profileData));
+      })
+      .catch(err => {
+        alert('Błąd zapisu danych — dane tymczasowo zapisane lokalnie');
+        const profileData = { email, name, address };
+        localStorage.setItem('profileData_' + email, JSON.stringify(profileData));
+      });
+  });
+
+  // Wczytaj zamówienia z serwera i localStorage (customOrders)
+  function loadOrderHistory() {
+    const tbody = document.querySelector('#order-history tbody');
+    tbody.innerHTML = '';
+
+    // Funkcja pomocnicza - dodaje zamówienia lokalne (na wymiar)
+    function renderLocalOrders() {
+      const localOrders = JSON.parse(localStorage.getItem('customOrders')) || [];
+      localOrders.forEach(order => {
+        const row = `<tr><td>${order.data}</td><td>${order.produkt} (na wymiar)</td></tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    fetch('pobierz_zamowienia.php?email=' + encodeURIComponent(email))
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          data.forEach(order => {
+            const row = `<tr><td>${order.data}</td><td>${order.produkt}</td></tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+          });
+        }
+        renderLocalOrders();
+
+        if (tbody.children.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2">Brak zamówień</td></tr>';
+        }
+      })
+      .catch(err => {
+        // NIE wyświetlamy błędu - tylko lokalne zamówienia
+        renderLocalOrders();
+
+        if (tbody.children.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2">Brak zamówień</td></tr>';
+        }
+      });
+  }
+
+  loadOrderHistory();
+
+  function logout() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('profileData_' + email);
+    localStorage.removeItem('customOrders');
+    window.location.href = 'logowanie.html';
+  }
+</script>
+</body>
+</html>
