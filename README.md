@@ -25,13 +25,25 @@ Projekt strony internetowej umożliwiającej składanie zamówień mebli na wymi
    ```bash
    git clone https://github.com/twoj-login/Allegro_Na_Miare.git
    ```
+2.Rozpakuj folder IMG.
 
-2. Otwórz `index.html` w przeglądarce.
+3. Otwórz `index.html` w przeglądarce.
 
-3. Aby przetestować formularze z zapisem danych:
+4. Aby przetestować formularze z zapisem danych:
    - Upewnij się, że serwer (np. XAMPP, WAMP) jest uruchomiony
    - Umieść pliki projektu w folderze `htdocs/`
    - Odwiedź `http://localhost/Allegro_Na_Miare/index.html`
+   - Kliknij w przycisk "Moje Allegro na miare"
+
+
+##  Import bazy danych
+
+1. Otwórz **phpMyAdmin** 
+2. Utwórz nową bazę danych o nazwie: `allegro_na_miare`
+3. Zaimportuj plik `users.sql`, który znajduje się w katalogu `Baza/` projektu.
+   - W phpMyAdmin: kliknij w bazę → Import → wybierz plik `users.sql` → Importuj
+4. Sprawdź, czy tabele `users` zostały poprawnie utworzone.
+
 
 ##  Wymagania
 
@@ -43,13 +55,3 @@ Projekt strony internetowej umożliwiającej składanie zamówień mebli na wymi
 Projekt testowy wykonany na potrzeby nauki frontendu oraz przechowywania danych użytkownika.
 
  Projekt edukacyjny – niekomercyjny.
-
-##  Import bazy danych
-
-1. Otwórz **phpMyAdmin** 
-2. Utwórz nową bazę danych o nazwie: `allegro_na_miare`
-3. Zaimportuj plik `users.sql`, który znajduje się w katalogu `Baza/` projektu.
-   - W phpMyAdmin: kliknij w bazę → Import → wybierz plik `users.sql` → Importuj
-4. Sprawdź, czy tabele `users` zostały poprawnie utworzone.
-
-
