@@ -112,7 +112,7 @@
 </div>
 
 <script>
-  // Pobierz dane użytkownika z localStorage
+ 
   const userDataRaw = localStorage.getItem('user');
   if (!userDataRaw) window.location.href = 'logowanie.html';
 
@@ -127,14 +127,14 @@
   const email = userData.email || '';
   document.getElementById('email').value = email;
 
-  // Wczytaj dane profilu z localStorage, jeśli istnieją
+
   const localProfile = JSON.parse(localStorage.getItem('profileData_' + email));
   if (localProfile) {
     document.getElementById('name').value = localProfile.name || '';
     document.getElementById('address').value = localProfile.address || '';
   }
 
-  // Pobierz dane profilu z serwera, nadpisz localStorage
+ 
   fetch('pobierz_dane.php?email=' + encodeURIComponent(email))
     .then(res => res.json())
     .then(data => {
@@ -144,7 +144,7 @@
     })
     .catch(err => console.error(err));
 
-  // Obsługa zapisu formularza
+
   document.getElementById('profile-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -170,12 +170,11 @@
       });
   });
 
-  // Wczytaj zamówienia z serwera i localStorage (customOrders)
+
   function loadOrderHistory() {
     const tbody = document.querySelector('#order-history tbody');
     tbody.innerHTML = '';
 
-    // Funkcja pomocnicza - dodaje zamówienia lokalne (na wymiar)
     function renderLocalOrders() {
       const localOrders = JSON.parse(localStorage.getItem('customOrders')) || [];
       localOrders.forEach(order => {
@@ -200,7 +199,7 @@
         }
       })
       .catch(err => {
-        // NIE wyświetlamy błędu - tylko lokalne zamówienia
+
         renderLocalOrders();
 
         if (tbody.children.length === 0) {
