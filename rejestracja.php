@@ -4,7 +4,7 @@ $db = "allegro_na_miare";
 $user = "root";
 $pass = "";
 
-// Połączenie z bazą
+
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) die("Błąd połączenia: " . $conn->connect_error);
 
@@ -12,7 +12,7 @@ $name = $_POST['name'];
 $email = $_POST['email'];
 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-// Zapis do bazy
+
 $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("sss", $name, $email, $password);
